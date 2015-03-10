@@ -14,5 +14,9 @@ local symbols as described in _TAOCP_ §1.3.2. So in order to assemble these
 on Plan 9, you'll need to download or patch [6a](http://man.cat-v.org/9front/1/2a) with the extension I wrote
 [here](http://www.codigo.co/code/C/local_labels/).
 
+The C programs are written for the Plan 9 compiler and libraries. They
+are not difficult to port to Unix. For more information on the differences
+see [this paper](http://doc.cat-v.org/plan_9/4th_edition/papers/comp).
+
 I am also trying to maintain unix versions as well so find those in the Unix
 [subdirectory](http://www.codigo.co/code/Knuth/x86_64/unix/).
