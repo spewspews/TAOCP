@@ -1,0 +1,30 @@
+</amd64/mkfile
+
+1.3.2ex18: 1.3.2ex18.s saddlemain.c
+	6a 1.3.2ex18.s
+	6c saddlemain.c
+	6l -o 1.3.2ex18 saddlemain.6 1.3.2ex18.6
+
+1.3.2ex3: 1.3.2ex3.s progm.s
+	6a 1.3.2ex3.s
+	6a progm.s
+	6l -o 1.3.2ex3 -lc 1.3.2ex3.6 progm.6
+
+printlongs: printlongs.c
+	6c printlongs.c
+	6l -o printlongs printlongs.6
+
+1.3.2progp: 1.3.2progp.s
+	6a 1.3.2progp.s
+	6l -o 1.3.2progp /amd64/lib/libc.a 1.3.2progp.6
+
+1.3.2progm: main1.3.2progm.c 1.3.2progm.s
+	6a 1.3.2progm.s
+	6c main1.3.2progm.c
+	6l -o 1.3.2progm 1.3.2progm.6 main1.3.2progm.6
+
+%:	%.s
+	6a $stem.s
+	6l -o $stem -lc $stem.6
+
+</sys/src/cmd/mkone

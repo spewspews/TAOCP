@@ -1,0 +1,12 @@
+</$objtype/mkfile
+
+TARG=	2.3.1
+OFILES=	2.3.1main.$O\
+	2.3.1progt.$O\
+	2.3.1ex12.$O\
+	2.3.1ex13.$O\
+	2.3.1util.$O
+HFILES=	2.3.1.h
+BIN=	.
+
+</sys/src/cmd/mkone
