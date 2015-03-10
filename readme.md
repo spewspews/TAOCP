@@ -18,5 +18,5 @@ The C programs are written for the Plan 9 compiler and libraries. They
 are not difficult to port to Unix. For more information on the differences
 see [this paper](http://doc.cat-v.org/plan_9/4th_edition/papers/comp).
 
-I am also trying to maintain unix versions as well so find those in the Unix
+I am also maintaining unix versions of the assembly code so find those in the Unix
 [subdirectory](http://www.codigo.co/code/Knuth/x86_64/unix/).
