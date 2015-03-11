@@ -23,6 +23,11 @@ printlongs: printlongs.c
 	6c main1.3.2progm.c
 	6l -o 1.3.2progm 1.3.2progm.6 main1.3.2progm.6
 
+1.3.3progi: 1.3.3progimain.c 1.3.3progi.s
+	6a 1.3.3progi.s
+	6c 1.3.3progimain.c
+	6l -o 1.3.3progi 1.3.3progi.6 1.3.3progimain.6
+
 %:	%.s
 	6a $stem.s
 	6l -o $stem -lc $stem.6
