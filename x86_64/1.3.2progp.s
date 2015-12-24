@@ -16,32 +16,28 @@ TEXT main(SB), $16
 	MOVW	$2, x(SB)	/* first prime */
 	MOVW	$3, n	/* second prime */
 	MOVQ	$1, j
-Mtwo:
+0(H):
 	MOVW	n, x(SB)(j*2)	/* add new prime to array */
 	INCQ	j
-Mthree:
 	CMPQ	j, $L
-	JEQ	end
-Mfour:
+	JEQ	0(F)
+1(H):
 	ADDW	$2, n	/* next prime candidate */
-Mfive:
 	MOVQ	$1, k
-Msix:
+2(H):
 	MOVWLZX	x(SB)(k*2), pk
 	MOVWLZX	n, AX
 	XORQ	DX, DX
 	DIVL	pk	/* divide by prime from array */
 	CMPL	DX, $0	/* not prime if no remainder */
-	JEQ	Mfour
-Mseven:
+	JEQ	1(B)
 	CMPL	AX, pk	/* prime if quotient is ≤ to divisor */
-	JLE	Mtwo
-Meight:
+	JLE	0(B)
 	INCQ	k	/* try dividing by next prime  in array */
-	JMP	Msix
-end:
+	JMP	2(B)
+0(H):
 	XORQ	j, j
-loop:
+0(H):
 	PUSHQ	j	/* print all the prime numbers */
 	MOVQ	$fmt(SB), RARG
 	MOVWLZX	x(SB)(j*2), t
@@ -51,7 +47,7 @@ loop:
 	INCQ	j
 	CMPQ	j, $L
 	JEQ	2(PC)
-	JMP	loop
+	JMP	0(B)
 	XORQ	RARG, RARG
 	CALL	exits(SB)
 	RET

@@ -4,88 +4,97 @@
 
 #include "/sys/src/libc/9syscall/sys.h"
 
-#define size	SI
-#define k	DI
-#define j	R8
-#define x	R9
-#define z	R10
+#define char R8
+#define ioptr R9
+#define hold R10
+#define next R11
+#define chari R12
 
-GLOBL	t(SB), $0x80			/* a table for all valid names */
-GLOBL	inbuf(SB), $1000
-GLOBL	outbuf(SB), $1000
+GLOBL t(SB), $0x80   /* a table for all valid names */
+GLOBL buf(SB), $1000
 
-TEXT	main(SB), $40
-	MOVQ	$0, 8(SP)
-	MOVQ	$inbuf(SB), 16(SP)
-	MOVQ	$1000, 24(SP)
-	MOVQ	$-1, 32(SP)
-	MOVQ	$PREAD, RARG
+TEXT main(SB), $40
+	MOVQ $0, 8(SP)
+	MOVQ $buf(SB), 16(SP)
+	MOVQ $1000, 24(SP)
+	MOVQ $-1, 32(SP)
+	MOVQ $PREAD, RARG
 	SYSCALL
-	CMPL	AX, $0
-	JLE	Fail
-	LEAL	-1(AX), size		/* decrement for newline at end */
-	MOVQ	$0x21, k		/* B1. Initialize. Set k to first valid  name */
-0(H):	MOVB	k, t(SB)(k*1)		/* t[k]←k */
-	INCQ	k
-	CMPQ	k, $0x80		/* Loop until k = 0x7f */
-	JL	0(B)
-	MOVL	size, k
-	JMP	9(F)
-2(H):	MOVQ	$0, x			/* initialize upper bits to 0 */
-	MOVQ	$0, AX
-	MOVB	inbuf(SB)(k*1), x	/* B2. Next element */
-	CMPB	x, $')'
-	JE	0(F)
-	CMPB	x, $'('
-	CMOVQEQ	j, x			/* B4. Change t[i]. */
-	CMPB	z, $0
-	CMOVQEQ	x, j			/* B3. Change t[j] */
-	MOVB	t(SB)(x*1), AX
-	MOVB	z, t(SB)(x*1)
-0(H):	MOVQ	AX, z
-9(H):	DECL	k
-	CMPL	k, $0
-	JGE	2(B)
-Output:	MOVL	$0, j
-	MOVQ	$0, x
-	MOVQ	$0x21, k
-0(H):	MOVB	t(SB)(k*1), x
-	CMPB	x, k
-	JE	2(F)			/* Skip singleton. */
-	CMPB	x, $0
-	JL	2(F)			/* Skip tagged element. */
-	MOVB	$'(', outbuf(SB)(j*1)	/* Output ‘(’ */
-	INCL	j
-	MOVQ	k, z			/* Loop invariant: x = t[z] */
-1(H):	MOVB	z, outbuf(SB)(j*1)	/* Output z. */
-	INCL	j
-	MOVB	x, AX
-	ORB	$0x80, AX
-	MOVB	AX, t(SB)(z*1)		/* Tag t[z] */
-	MOVB	x, z			/* advance z */
-	MOVB	t(SB)(z*1), x		/* Get successor element */
-	CMPB	x, $0			/*	and continue, if */
-	JGE	1(B)			/* 	untagged         */
-	MOVB	$')', outbuf(SB)(j*1)	/* Otherwise, output ‘)’ */
-	INCL	j
-2(H):	INCQ	k			/* Advance in Table t */
-	CMPQ	k, $0x80
-	JL	0(B)
-Done:	CMPL	j, $0			/* Is answer the identity permutation? */
-	JG	0(F)			/* If so, change to '()' */
-	MOVB	$'(', outbuf(SB)
-	MOVB	$')', outbuf+1(SB)
-	MOVL	$2, j
-0(H):	MOVB	$'\n', outbuf(SB)(j*1)
-	MOVQ	$1, 8(SP)
-	MOVQ	$outbuf(SB), 16(SP)
-	LEAL	1(j), AX		/* length of answer is j+1 including new line */
-	MOVL	AX, 24(SP)
-	MOVQ	$-1, 32(SP)
-	MOVQ	$PWRITE, RARG		/* print the answer */
+	CMPL AX, $0
+	JLE Fail
+	LEAQ buf-1(SB)(AX*1), ioptr /* decrement for newline at end */
+	MOVQ $0x21, char  /* B1. Initialize. Set char to first valid  name */
+0(H):
+	MOVB char, t(SB)(char*1)
+	INCQ char
+	CMPQ char, $0x80  /* Loop until char = 0x7f */
+	JL 0(B)
+	JMP 9(F)
+2(H):
+	MOVBQZX (ioptr), char /* B2. Next element */
+	CMPB char, $')'
+	JNE 1(F)
+	MOVB $0, next
+	JMP 9(F)
+1(H):
+	CMPB char, $'('
+	CMOVQEQ hold, char /* B4. Change t[i]. */
+	CMPB next, $0
+	CMOVQEQ char, hold /* B3. Change t[hold] */
+	MOVB t(SB)(char*1), AX
+	MOVB next, t(SB)(char*1)
+	MOVB AX, next
+9(H):
+	DECQ ioptr
+	CMPQ ioptr, $buf(SB)
+	JGE 2(B)
+Output:
+	MOVQ $buf(SB), ioptr
+	MOVQ $0x21, chari
+0(H):
+	MOVB t(SB)(chari*1), next
+	CMPB next, chari
+	JE 2(F) /* Skip singleton. */
+	CMPB next, $0
+	JL 2(F) /* Skip tagged element. */
+	MOVB $'(', (ioptr) /* Output ‘(’ */
+	INCQ ioptr
+	MOVQ chari, char /* Loop invariant: next = t[char] */
+1(H):
+	MOVB char, (ioptr) /* Output char. */
+	INCQ ioptr
+	MOVB next, AX
+	ORB $0x80, AX
+	MOVB AX, t(SB)(char*1) /* Tag t[char] */
+	MOVB next, char  /* advance char */
+	MOVB t(SB)(char*1), next /* Get successor element */
+	CMPB next, $0  /* and continue, if */
+	JGE 1(B)   /*  untagged         */
+	MOVB $')', (ioptr)  /* Otherwise, output ‘)’ */
+	INCQ ioptr
+2(H):
+	INCQ chari   /* Advance in Table t */
+	CMPQ chari, $0x80
+	JL 0(B)
+Done:
+	CMPQ ioptr, $buf(SB)  /* Is answer the identity permutation? */
+	JG 0(F)   /* If so, change to '()' */
+	MOVB $'(', buf(SB)
+	MOVB $')', buf+1(SB)
+	MOVQ $buf+2(SB), ioptr
+0(H):
+	MOVB $'\n', (ioptr)
+	INCQ ioptr
+	MOVQ $1, 8(SP)
+	MOVQ $buf(SB), 16(SP)
+	SUBQ $buf(SB), ioptr
+	MOVL ioptr, 24(SP)
+	MOVQ $-1, 32(SP)
+	MOVQ $PWRITE, RARG  /* print the answer */
 	SYSCALL
-Fail:	MOVQ	$0, 8(SP)
-	MOVQ	$EXITS, RARG
+Fail:
+	MOVQ $0, 8(SP)
+	MOVQ $EXITS, RARG
 	SYSCALL
 	RET
 	END

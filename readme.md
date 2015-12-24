@@ -1,22 +1,18 @@
 Knuth's TAOCP
 =============
 
-I am currently reading Knuth’s _TAOCP_ and implementing the programs and
-exercises in C and x86-64 assembly.  I may add some other languages
-(possibly Go, Python, or ARM assembly).
+I am currently reading Knuth’s
+[TAOCP](http://www-cs-faculty.stanford.edu/~uno/taocp.html) and
+implementing the programs and exercises using x86-64 assembly instead
+of MIX or [MMIX](http://mmix.cs.hm.edu/).
 
 Caveat:
 -------
-The x86-64 assembly is written for the [Plan 9
-assembler](http://doc.cat-v.org/plan_9/4th_edition/papers/asm) and the
-Plan 9 calling convention. However, this assembler does not support 
-local symbols as described in _TAOCP_ §1.3.2. So in order to assemble these
-on Plan 9, you'll need to download or patch [6a](http://man.cat-v.org/9front/1/2a) with the extension I wrote
-[here](http://www.codigo.co/code/C/local_labels/).
+The assembly and C is written for the [Plan 9
+Operating System](http://plan9.bell-labs.com/plan9/). I use the [9front](http://www.9front.org/) fork. I have made a couple modifications to the assembler
+to make assembly programming slightly easier. Ask me if you want those
+changes (you will need them if you want to assemble these programs).
 
-The C programs are written for the Plan 9 compiler and libraries. They
-are not difficult to port to Unix. For more information on the differences
-see [this paper](http://doc.cat-v.org/plan_9/4th_edition/papers/comp).
-
-I am also maintaining unix versions of the assembly code so find those in the Unix
-[subdirectory](http://www.codigo.co/code/Knuth/x86_64/unix/).
+I have a few unix versions of the assembly code in the unix
+[subdirectory](http://www.codigo.co/code/Knuth/x86_64/unix/). The GCC
+assembler assembles those.
