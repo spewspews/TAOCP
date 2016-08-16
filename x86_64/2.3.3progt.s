@@ -1,105 +1,79 @@
-/*
- * Program T.
- * C prototype: int *topsort(int *rel, int maxn)
- * returns sorted array of ints with 0 as sentinel
- */
-
 count = 0
+qlink = 0
 top = 4
 j = 0
 k = 4
 suc = 0
 next = 4
 
-#define I AX
-#define COUNT CX
-#define TOP DX
-#define SUC CX
-#define NEXT DX
-#define QLINK CX
-#define AVAIL SI
-#define J DI
-#define K R8
-#define P R9
-#define REAR R10
-#define FRONT R11
-#define S R12
-#define T R13
+GLOBL x(SB), $(1000 * 8)
 
-GLOBL pool(SB), $(1000 * 8)
-DATA fmt(SB)/4, $"%d\n\z"
-GLOBL fmt(SB), $8
+/*
+ * RARG (BP) initially set to buffer.
+ * BX ≡ AVAIL and P
+ * CX ≡ j and R
+ * DX ≡ k
+ * SI ≡ pool X
+ * DI ≡ buffer pointer
+ * R8 ≡ F
+ */
 
-TEXT topsort(SB), $40
-	MOVQ RARG, I
-	MOVL $1, AVAIL
-	MOVL n+8(FP), T
-	ADDL T, AVAIL
-	INCL AVAIL         /* Allocate space for QLINK[0] and N COUNT and TOP fields */
-	SHLL $3, AVAIL
-	MOVQ $pool+count(SB), COUNT
-	MOVQ $pool+top(SB), TOP
-	JMP T2
-T3:
-	SHLL $3, K
-	SHLL $3, J
-	MOVL (COUNT)(K), T
-	INCL T
-	MOVL T, (COUNT)(K)     /* Increment the successor */
-	MOVL AVAIL, P          /* Allocate successor node */
-	ADDL $8, AVAIL
-	MOVL K, (SUC)(P)
-	MOVL (TOP)(J), T
-	MOVL T, (NEXT)(P)
-	MOVL P, (TOP)(J)       /* Add to predecessor list */
-T2:
-	MOVL j(I), J
-	MOVL k(I), K
-	ADDQ $8, I
-	CMPL J, $0
-	JG T3
-T4:
-	MOVQ $0, REAR
-	MOVL n+8(FP), K
-	SHLL $3, K
+TEXT topsort(SB), $0
+	MOVQ RARG, DI // Store buffer pointer in a register.
+	MOVL $x(SB), SI	// Store the memory pool location in a register.
+	MOVL n+8(FP), BX
+	INCL BX	// Storage starts after X[n].
 1(H):
-	MOVL (COUNT)(K), T
-	CMPL T, $0
-	JNE 0(F)
-	MOVL K, (QLINK)(REAR)
-	MOVL K, REAR
-0(H):
-	SUBL $8, K
-	CMPQ K, $0
-	JG 1(B)
-	MOVL (QLINK), FRONT
-	MOVQ RARG, I        /* buffer start, use input buffer for return buffer */
-	JMP T5
-T5B:
-	MOVL (TOP)(FRONT), P
-	CMPL P, $0
-	JE T7
-T6:
-	MOVL (SUC)(P), S
-	MOVL (COUNT)(S), T
-	DECL T
-	MOVL T, (COUNT)(S)
-	CMPL T, $0
-	JNE 0(F)
-	MOVL S, (QLINK)(REAR)
-	MOVL S, REAR
-0(H):
-	MOVL (NEXT)(P), P
-	CMPL P, $0
-	JNE T6
-T7:
-	MOVL (QLINK)(FRONT), FRONT
-T5:
-	MOVL FRONT, (I)
-	SHRL $3, (I)
-	ADDQ $4, I
-	CMPL FRONT, $0
-	JNE T5B
+	MOVL j(DI), CX // T2. Next relation.
+	CMPL CX, $0
+	JEQ 1(F)	// Is j > 0?
+	MOVL k(DI), DX	// T3. Record the relation.
+	INCL count(SI)(DX*8)	// COUNT[k] + 1 → COUNT[k].
+	MOVL top(SI)(CX*8), AX	// TOP[j]
+	MOVL AX, next(SI)(BX*8)	// 	→ NEXT(P).
+	MOVL DX, suc(SI)(BX*8)	// k → SUC(P).
+	MOVL BX, top(SI)(CX*8)	// P → TOP[j].
+	INCL BX	// AVAIL ← AVAIL+1.
+	ADDQ $8, DI	// Increase buffer pointer.
+	JMP 1(B)
+1(H):
+	MOVL n+8(FP), DX	// T4. Scan for zeros. k ← n
+	MOVQ RARG, DI	// Reset buffer pointer for output.
+	MOVL $0, CX	// R ← 0.
+1(H):
+	CMPL count(SI)(DX*8), $0	// Examine COUNT[k].
+	JG 3(PC)	// Is it nonzero?
+	MOVL DX, qlink(SI)(CX*8)	// QLINK[R] ← k.
+	MOVL DX, CX	// R ← k
+	DECL DX
+	CMPL DX, $0
+	JG 1(B)	// n ≥ k ≥ 1
+// Sorting phase.
+	MOVL qlink(SI), R8	// F ← QLINK[0]
+1(H):	// T5. Output front of queue.
+	MOVL R8, (DI)	// Store F in buffer area.
+	CMPL R8, $0
+	JEQ 1(F)	// Is F zero?
+	ADDL $4, DI	// Advance buffer pointer.
+	MOVL top(SI)(R8*8), BX	// P ← TOP[F]
+	CMPL BX, $0
+	JEQ 3(F)
+2(H):	// T6. Erase relations.
+	MOVL suc(SI)(BX*8), DX	// k ← suc(P).
+	MOVL count(SI)(DX*8), AX	// COUNT[k]
+	DECL AX	//	-1
+	MOVL AX, count(SI)(DX*8)	//	→ COUNT[k]
+	CMPL AX, $0
+	JG 3(PC)	// Has zero been reached?
+	MOVL DX, qlink(SI)(CX*8)	// If so, set QLINK[R] ← k
+	MOVL DX, CX	// R ← k
+	MOVL next(SI)(BX*8), BX	// P ← NEXT(P).
+	CMPL BX, $0
+	JG 2(B)	// If P ≠ Λ, repeat.
+3(H):
+	MOVL qlink(SI)(R8*8), R8	// T7. Remove from queue.
+	JMP 1(B)	// F ← QLINK(F), goto T5.
+1(H):
 	MOVQ RARG, AX
 	RET
 	END
