@@ -1,5 +1,4 @@
 /* print the first 500 primes */
-#include <machine/asm.h>
 
 #define L	500
 #define n	%bx
@@ -7,11 +6,16 @@
 #define k	%r13
 #define pk	%r14d
 
-	.data
-fmt:	.asciz	"%d\n"
-	.comm	x, L*2
+	.global main
 
-ENTRY(main)
+	.data
+fmt:
+	.asciz	"%d\n"
+x:
+	.space L*2
+
+	.text
+main:
 	movw	$2, x	/* first prime */
 	movw	$3, n	/* second prime */
 	movq	$1, j
