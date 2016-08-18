@@ -55,5 +55,5 @@ loop:
 	jmp	loop
 end:
 	xorq	%rdi, %rdi
-	callq	exit
+	call	exit
 	ret
