@@ -70,9 +70,9 @@ TEXT topsort(SB), $0
 	MOVL next(SI)(BX*8), BX	// P ← NEXT(P).
 	CMPL BX, $0
 	JG 2(B)	// If P ≠ Λ, repeat.
-3(H):
-	MOVL qlink(SI)(R8*8), R8	// T7. Remove from queue.
-	JMP 1(B)	// F ← QLINK(F), goto T5.
+3(H):	// T7. Remove from queue.
+	MOVL qlink(SI)(R8*8), R8	// F ← QLINK(F), 
+	JMP 1(B)	// goto T5.
 1(H):
 	MOVQ RARG, AX
 	RET
