@@ -17,8 +17,8 @@ struct Node {
 int*
 topsort(int *arr, int n)
 {
-	Head *heads;
-	Node *p;
+	Head *heads, *h;
+	Node *p, *q;
 	int i, j, k, r, f, *bp;
 	
 	heads = calloc(n+1, sizeof(*heads));
@@ -48,14 +48,26 @@ topsort(int *arr, int n)
 		*bp++ = f;
 		if(f == 0)
 			break;
-		for(p = heads[f].top; p != NULL; p = p->next) {
+		for(p = heads[f].top; p != NULL; p = q) {
 			if(--heads[p->suc].count == 0) {
 				heads[r].qlink = p->suc;
 				r = p->suc;
 			}
+			q = p->next;
+			free(p);
 		}
+		heads[f].top = NULL;
 		f = heads[f].qlink;
 	}
 	
+	/* In case we have a cycle */
+	for(h = heads; h < heads + n+1; h++) {
+		for(p = h->top; p != NULL; p = q) {
+			q = p->next;
+			free(p);
+		}
+	}
+	
+	free(heads);
 	return arr;
 }
