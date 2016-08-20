@@ -1,7 +1,9 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct Node Node;
 typedef struct Head Head;
+typedef struct Pool Pool;
 
 struct Head {
 	int count;
@@ -14,13 +16,38 @@ struct Node {
 	Node *next;
 };
 
+struct Pool {
+	unsigned int max;
+	unsigned int avail;
+	Node *nodes;
+};
+
+Node*
+allocnode(Pool *pool)
+{
+	if(pool->avail == pool->max) {
+		fprintf(stderr, "Overflow in pool of size %u\n", pool->max);
+		exit(1);
+	}
+	return &pool->nodes[pool->avail++];
+}
+
 int*
 topsort(int *arr, int n)
 {
-	Head *heads, *h;
-	Node *p, *q;
-	int i, j, k, r, f, *bp;
-	
+	Head *heads;
+	Node *p;
+	Pool pool;
+	int i, j, k, r, f, nrel, *bp;
+
+	nrel = 0;
+	for(bp = arr; *bp != 0; bp += 2)
+		nrel++;
+
+	pool.max = nrel;
+	pool.avail = 0;
+	pool.nodes = calloc(nrel, sizeof(*pool.nodes));
+
 	heads = calloc(n+1, sizeof(*heads));
 	for(bp = arr; *bp != 0; bp += 2) {
 		j = bp[0];
@@ -28,7 +55,7 @@ topsort(int *arr, int n)
 		
 		heads[k].count++;
 		
-		p = malloc(sizeof(*p));
+		p = allocnode(&pool);
 		p->suc = k;
 		p->next = heads[j].top;
 		heads[j].top = p;
@@ -48,26 +75,17 @@ topsort(int *arr, int n)
 		*bp++ = f;
 		if(f == 0)
 			break;
-		for(p = heads[f].top; p != NULL; p = q) {
+		for(p = heads[f].top; p != NULL; p = p->next) {
 			if(--heads[p->suc].count == 0) {
 				heads[r].qlink = p->suc;
 				r = p->suc;
 			}
-			q = p->next;
-			free(p);
 		}
 		heads[f].top = NULL;
 		f = heads[f].qlink;
 	}
-	
-	/* In case we have a cycle */
-	for(h = heads; h < heads + n+1; h++) {
-		for(p = h->top; p != NULL; p = q) {
-			q = p->next;
-			free(p);
-		}
-	}
-	
+
 	free(heads);
+	free(pool.nodes);
 	return arr;
 }
