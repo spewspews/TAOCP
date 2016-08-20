@@ -13,7 +13,7 @@ progp: uprogp.S
 	$(CC) uprogp.S
 	mv a.out progp
 
-2.3.3progt: 2.3.3progt.o 2.3.3progtmain.o
+2.2.3progt: 2.2.3progt.o 2.2.3progtmain.o
 	$(CC) -o $@ $^
 
 .S.o:
@@ -23,4 +23,4 @@ progp: uprogp.S
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm *.o *.s 2.3.3progt progm
+	rm *.o 2.2.3progt progm
