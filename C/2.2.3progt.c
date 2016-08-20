@@ -81,7 +81,6 @@ topsort(int *arr, int n)
 				r = p->suc;
 			}
 		}
-		heads[f].top = NULL;
 		f = heads[f].qlink;
 	}
 
