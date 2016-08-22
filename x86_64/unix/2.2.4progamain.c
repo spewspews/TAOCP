@@ -58,10 +58,19 @@ addterm(Poly *p, int32_t coef, unsigned char a, unsigned char b, unsigned char c
 	return 0;
 }
 
+void
+printpoly(Poly *p)
+{
+	for(p = p->link; p->link->abc != -1; p = p->link)
+		printf("%dx^%dy^%dz^%d + ", p->coef, p->abc >> 16, (p->abc >> 8)&0xff, p->abc&0xff);
+	printf("%dx^%dy^%dz^%d", p->coef, p->abc >> 16, (p->abc >> 8)&0xff, p->abc&0xff);
+	putchar('\n');
+}
+
 int
 main(int argc, char **argv)
 {
-	Poly *pool, *p;
+	Poly *pool, *p, *q;
 
 	pool = calloc(500, sizeof(*pool));
 	for(p = pool; p < pool+499; p++)
@@ -69,5 +78,11 @@ main(int argc, char **argv)
 	p->link = NULL;
 	avail = pool;
 
+	p = makepoly();
+	addterm(p, -1, 0, 0, 1);
+	addterm(p, 3, 1, 2, 3);
+	addterm(p, 5, 1, 0, 2);
+
+	printpoly(p);
 	exit(0);
 }
