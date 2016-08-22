@@ -35,7 +35,30 @@ add:
 	addl	coef(%rdi),	%eax	// 	+ COEF(Q)
 	movl	%eax,	coef(%rdi)	// 		-> COEF(Q)
 	cmpl	$0,	%eax
-	jne	1b
+	jne	1b	// Jump if nonzero.
+	movq	%rdi,	%rcx	// A4. Delete zero term. Q2 <- Q.
+	movq	link(%rdi),	%rdi	// Q <- LINK(Q).
+	movq	avail,	%rax
+	movq	%rax,	link(%rcx)	// AVAIL <= Q2.
+	movq	%rcx,	(%rax)
+	movq	%rdi,	link(%rdx)	// LINK(Q1) <- Q
+	jmp	0b
 5:
+	movq	avail,	%rcx	// A5. Insert new term.
+	cmpq	$0,	%rcx
+	je	overflow
+	movq	link(%rcx),	%r8	// Q2 <= AVAIL
+	movq	%r8,	avail
+	movl	%eax,	abc(%rcx)	// ABC(Q2) <- ABC(P) (%eax still holds ABC(P)).
+	movl	coef(%rsi),	%eax	// %eax <- COEF(P).
+	movl	%eax,	coef(%rcx)	// COEF(Q2) <- %eax
+	movq	%rdi,	link(%rcx)	// LINK(Q2) <- Q
+	movq	%rcx,	link(%rdx)	// LINK(Q1) <- Q
+	movq	%rcx,	%rdx	// Q1 <- Q2
+	jmp	0b
 return:
+	movl	$0, %eax
+	ret
+overflow:
+	movl	$-1,	%eax
 	ret

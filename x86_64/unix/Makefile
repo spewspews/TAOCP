@@ -16,6 +16,9 @@ progp: uprogp.S
 2.2.3progt: 2.2.3progt.o 2.2.3progtmain.o
 	$(CC) -o $@ $^
 
+2.2.4proga:	2.2.4proga.o 2.2.4progamain.o
+	$(CC) -o $@ $^
+
 .S.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
 
@@ -23,4 +26,4 @@ progp: uprogp.S
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm *.o 2.2.3progt progm
+	rm *.o 2.2.3progt progm 2.2.4proga

@@ -24,6 +24,5 @@ main(int argc, char **argv)
 	p->link = NULL;
 	avail = pool;
 
-	add(p, avail);
 	exit(0);
 }
