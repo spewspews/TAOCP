@@ -1,16 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-
-typedef struct Poly Poly;
-
-struct Poly {
-	int32_t coef;
-	int32_t abc;
-	Poly *link;
-};
-
-int	add(Poly *q, Poly *p);
+#include "2.2.4proga.h"
 
 Poly *avail;
 
