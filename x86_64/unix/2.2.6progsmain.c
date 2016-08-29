@@ -135,8 +135,10 @@ matrixfmt(Fmt *fmt)
 		n = m->baserow[i].right;
 		for(j = 0; j < m->cols; j++) {
 			c = j+1 < m->cols ? '\t' : '\n';
-			if(j == n->col)
+			if(j == n->col) {
 				r = fmtprint(fmt, "%g%c", n->val, c);
+				n = n->right;
+			}
 			else
 				r = fmtprint(fmt, "0%c", c);
 
@@ -157,6 +159,9 @@ main(void)
 
 	m = makematrix(20, 20);
 	insert(m, 3.14159, 5, 16);
+	insert(m, 2.5, 5, 10);
+	insert(m, 1.923, 10, 10);
+	insert(m, 0.0, 0, 0);
 	print("%M", m);
 
 	exit(0);
