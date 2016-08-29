@@ -134,9 +134,9 @@ matrixfmt(Fmt *fmt)
 	for(i = 0; i < m->rows; i++) {
 		n = m->baserow[i].right;
 		for(j = 0; j < m->cols; j++) {
-			c = j+1 < m->cols ? ' ' : '\n';
+			c = j+1 < m->cols ? '\t' : '\n';
 			if(j == n->col)
-				r = fmtprint(fmt, "%g%c", c);
+				r = fmtprint(fmt, "%g%c", n->val, c);
 			else
 				r = fmtprint(fmt, "0%c", c);
 
@@ -155,11 +155,9 @@ main(void)
 
 	fmtinstall('M', matrixfmt);
 
-	print("Node size: %lu\n", sizeof(Node));
-	print("Matrix size: %lu\n", sizeof(Matrix));
-
 	m = makematrix(20, 20);
+	insert(m, 3.14159, 5, 16);
+	print("%M", m);
 
-	print("%u, %u\n", m->baserow->col, m->basecol->row);
 	exit(0);
 }
