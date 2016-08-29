@@ -24,7 +24,7 @@ progp: uprogp.S
 	$(CC) -o $@ $^ $(LDADD)
 
 .S.o:
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) -c -o $@ $<
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<

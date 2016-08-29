@@ -68,7 +68,7 @@ printpoly(Poly *p)
 }
 
 int
-main(int argc, char **argv)
+main(void)
 {
 	Poly *pool, *p, *q;
 
