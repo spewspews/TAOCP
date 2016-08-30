@@ -150,7 +150,7 @@ matrixfmt(Fmt *fmt)
 	return 0;
 }
 
-void pivot(Matrix*, int, int);
+int pivot(Matrix*, int, int);
 
 int
 main(void)
