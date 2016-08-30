@@ -18,6 +18,5 @@
  * %rsi is the row of the pivot.
  * %rdx is the col of the pivot.
 	.text
-	.align 8
 pivot:
 	
