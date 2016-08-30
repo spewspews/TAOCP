@@ -150,6 +150,8 @@ matrixfmt(Fmt *fmt)
 	return 0;
 }
 
+void pivot(Matrix*, int, int);
+
 int
 main(void)
 {
@@ -157,11 +159,13 @@ main(void)
 
 	fmtinstall('M', matrixfmt);
 
-	m = makematrix(20, 20);
-	insert(m, 3.14159, 5, 16);
-	insert(m, 2.5, 5, 10);
-	insert(m, 1.923, 10, 10);
-	insert(m, 0.0, 0, 0);
+	m = makematrix(4, 4);
+	insert(m, 50, 0, 0);
+	insert(m, 10, 1, 0);
+	insert(m, 20, 1, 2);
+	insert(m, -30, 3, 0);
+	insert(m, -60, 3, 2);
+	insert(m, 5, 3, 3);
 	print("%M", m);
 
 	exit(0);
