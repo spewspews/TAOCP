@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -g -O2
+CFLAGS = -Wall -Wextra -g
 LDADD = -lfmt -lutf
 
 1.4.2: u1.4.2.o
@@ -20,11 +20,11 @@ progp: uprogp.S
 2.2.4proga:	2.2.4proga.o 2.2.4progamain.o
 	$(CC) -o $@ $^
 
-2.2.6progs:	2.2.6progsmain.o
+2.2.6progs:	2.2.6progsmain.o 2.2.6progs.o
 	$(CC) -o $@ $^ $(LDADD)
 
 .S.o:
-	$(CC) -c -o $@ $<
+	$(CC) -g -c -o $@ $<
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<

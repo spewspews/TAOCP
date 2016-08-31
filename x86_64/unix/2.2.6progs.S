@@ -6,19 +6,21 @@
 	.equ row, 16
 	.equ col, 20
 	.equ val, 24
+	.equ nodesize, 32
 
 	/* Offsets for Matrix */
 	.equ baserow, 0
 	.equ basecol, 8
 	.equ rows, 16
 	.equ cols, 20
+	.equ matrixsize, 24
 
 
 /* 
  * On entry
  * %rdi points to the Matrix m
- * %rsi is the row of the pivot I0.
- * %rdx is the col of the pivot J0.
+ * %esi is the row of the pivot I0.
+ * %edx is the col of the pivot J0.
  * After entry
  * %rcx is P0
  * %r8 is Q0
@@ -26,18 +28,21 @@
  */
 	.text
 pivot:
+	movq	baserow(%rdi),	%rcx	// P0 <- LOC(BASEROW)
+	movq	$nodesize,	%rax	// Calculate offet of the I0 row.
+	mulq	%rsi
+	addq	%rax,	%rcx	// P0 <- LOC(BASEROW[I0])
+	movl	$-1,	%eax
 0:
-	leaq	baserow(%rdi,%rsi*8),	%rcx	// P0 <- LOC(baserow[I0])
-	movl	$-1,	%rax
 	movq	right(%rcx),	%rcx	// P0 <- right(P0)
-	cmpl	col(%rcx),	%rax	// Have we reached the end?
+	cmpl	col(%rcx),	%eax	// Have we reached the end?
 	je	nopivot	// If so there is no pivot element.
-	cmpl	col(%rcx),	%rdx
-	jb	0b	// Are we at the right column?
-	leaq	basecol(%rdi,%rdx*8),	%r8
+	cmpl	col(%rcx),	%edx
+	ja	0b	// Are we at the right column?
+	jb	nopivot	// No need to go farther than necessary
+	movq	col(%rcx),	%rax	// This is temporary just to verify the above code
+	ret
 	
-	cvtsi2sd	$1,	xmm0
-	movsd
 nopivot:
 	movq	$-1,	%rax
 	ret
