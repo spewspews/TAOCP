@@ -150,7 +150,7 @@ matrixfmt(Fmt *fmt)
 	return 0;
 }
 
-int pivot(Matrix*, int, int);
+double pivot(Matrix*, int, int);
 
 int
 main(void)
@@ -168,8 +168,7 @@ main(void)
 	insert(m, 5, 3, 3);
 	print("%M", m);
 
-	print("%d\n", pivot(m, 1, 0));
-	print("%d\n", pivot(m, 2, 2));
+	print("%g\n", pivot(m, 1, 0));
 
 	exit(0);
 }

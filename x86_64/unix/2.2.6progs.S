@@ -40,7 +40,10 @@ pivot:
 	cmpl	col(%rcx),	%edx
 	ja	0b	// Are we at the right column?
 	jb	nopivot	// No need to go farther than necessary
-	movq	col(%rcx),	%rax	// This is temporary just to verify the above code
+	movl	$1,	%eax
+	cvtsi2sd	%eax,	%xmm0	// ALPHA <- 1
+	movsd	val(%rcx),	%xmm1
+	divsd	%xmm1,	%xmm0	// ALPHA <- 1/VAL(P0)
 	ret
 	
 nopivot:
