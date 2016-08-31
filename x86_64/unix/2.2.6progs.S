@@ -30,7 +30,7 @@
 pivot:
 	movq	baserow(%rdi),	%rcx	// P0 <- LOC(BASEROW)
 	movq	$nodesize,	%rax	// Calculate offet of the I0 row.
-	mulq	%rsi
+	imulq	%rsi,	%rax
 	addq	%rax,	%rcx	// P0 <- LOC(BASEROW[I0])
 	movl	$-1,	%eax
 0:
