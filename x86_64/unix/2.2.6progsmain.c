@@ -168,7 +168,7 @@ main(void)
 	insert(m, 5, 3, 3);
 	print("%M", m);
 
-	print("%g\n", pivot(m, 1, 0));
+	print("%g\n", pivot(m, 1, 2));
 
 	exit(0);
 }
