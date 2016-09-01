@@ -1,5 +1,5 @@
 CFLAGS = -Wall -Wextra -g
-LDADD = -lfmt -lutf
+LDLIBS = -lfmt -lutf
 
 1.4.2: u1.4.2.o
 	$(CC) -static -o 1.4.2 $^
@@ -21,7 +21,7 @@ progp: uprogp.S
 	$(CC) -o $@ $^
 
 2.2.6progs:	2.2.6progsmain.o 2.2.6progs.o
-	$(CC) -o $@ $^ $(LDADD)
+	$(CC) -o $@ $^ $(LDLIBS)
 
 .S.o:
 	$(CC) -g -c -o $@ $<

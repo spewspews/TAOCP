@@ -16,10 +16,13 @@
 	.equ matrixsize, 24
 
 	/* Space on the stack */
-	.equ m, 0
+	.equ m, 0	// Can be something else.
 	.equ I0, 8
 	.equ J0, 12
-	.equ stacksize, 24
+	.equ BASEROW, 16
+	.equ BASECOL, 24
+	.equ PTR, 32
+	.equ stacksize, 40
 
 /* 
  * On entry
@@ -36,21 +39,30 @@
  */
 	.text
 pivot:
+	cmpl	rows(%rdi),	%esi
+	jae	nopivot
+	cmpl	cols(%rdi), %edx
+	jae	nopivot	// Is our pivot element out of range?
+
 	subq	$stacksize,	%rsp	// Allocate space on the stack.
 
+	// Store variables
 	movq	%rdi,	m(%rsp)
-	movl	%esi,	I0(%rsp)	// Store the variables
+	movl	%esi,	I0(%rsp)
 	movl	%edx,	J0(%rsp)
+	movq	baserow(%rdi),	BASEROW(%rsp)
+	movq	basecol(%rdi),	BASECOL(%rsp)
+
 	movl	cols(%rdi),	%edi
 	movq	$nodesize,	%rax
 	imulq	%rax,	%rdi	// Size of the PTR array
 	call	malloc	// Allocate it.
-	movq	%rax,	%r10	// Set PTR
-	movq	m(%rsp),	%rdi
+	movq	%rax,	PTR(%rsp)	// Set PTR
+
 	movl	I0(%rsp),	%esi	// Get the variables back
 	movl	J0(%rsp),	%edx
 
-	movq	baserow(%rdi),	%rcx	// P0 <- LOC(BASEROW[0])
+	movq	BASEROW(%rsp),	%rcx	// P0 <- LOC(BASEROW[0])
 	movq	$nodesize,	%r11	// Calculate offet of the I0 row.
 	imulq	%rsi,	%r11
 	addq	%r11,	%rcx	// P0 <- LOC(BASEROW[I0])
