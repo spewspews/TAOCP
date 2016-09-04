@@ -39,10 +39,11 @@
  */
 	.text
 pivot:
+	// Check if the pivot element is out of range.
 	cmpl	rows(%rdi),	%esi
 	jae	nopivot
 	cmpl	cols(%rdi), %edx
-	jae	nopivot	// Is our pivot element out of range?
+	jae	nopivot
 
 	subq	$stacksize,	%rsp	// Allocate space on the stack.
 
@@ -50,8 +51,10 @@ pivot:
 	movq	%rdi,	m(%rsp)
 	movl	%esi,	I0(%rsp)
 	movl	%edx,	J0(%rsp)
-	movq	baserow(%rdi),	BASEROW(%rsp)
-	movq	basecol(%rdi),	BASECOL(%rsp)
+	movq	baserow(%rdi),	%rax
+	movq	%rax,	BASEROW(%rsp)
+	movq	basecol(%rdi),	%rax
+	movq	%rax,	BASECOL(%rsp)
 
 	movl	cols(%rdi),	%edi
 	movq	$nodesize,	%rax
@@ -59,13 +62,9 @@ pivot:
 	call	malloc	// Allocate it.
 	movq	%rax,	PTR(%rsp)	// Set PTR
 
-	movl	I0(%rsp),	%esi	// Get the variables back
-	movl	J0(%rsp),	%edx
-
-	movq	BASEROW(%rsp),	%rcx	// P0 <- LOC(BASEROW[0])
-	movq	$nodesize,	%r11	// Calculate offet of the I0 row.
-	imulq	%rsi,	%r11
-	addq	%r11,	%rcx	// P0 <- LOC(BASEROW[I0])
+	movl	I0(%rsp),	%ecx
+	salq	$5,	%rcx
+	addq	BASEROW(%rsp),	%rcx	// P0 <- LOC(BASEROW[I0])
 	movl	$-1,	%eax
 0:
 	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0)
