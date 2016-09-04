@@ -170,5 +170,7 @@ main(void)
 
 	print("%g\n", pivot(m, 1, 2));
 
+	print("%M", m);
+
 	exit(0);
 }

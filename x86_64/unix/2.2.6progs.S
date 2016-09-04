@@ -16,12 +16,11 @@
 	.equ matrixsize, 24
 
 	/* Space on the stack */
-	.equ m, 0	// Can be something else.
-	.equ I0, 8
-	.equ J0, 12
-	.equ BASEROW, 16
-	.equ BASECOL, 24
-	.equ PTR, 32
+	.equ I0, 0
+	.equ J0, 4
+	.equ BASEROW, 8
+	.equ BASECOL, 16
+	.equ PTR, 24
 	.equ stacksize, 40
 
 /* 
@@ -31,11 +30,13 @@
  * %edx is the col of the pivot J0.
  * After entry
  * %rcx is P0
+ * %rdi is J
+ * %esi is PTR
+ * %xmm0 is ALPHA
+ * OLD STUFF BELOW
  * %r8 is Q0
  * %rdi is I
  * %r9 is J
- * %r10 is the array PTR
- * %xmm0 is ALPHA
  */
 	.text
 pivot:
@@ -48,7 +49,6 @@ pivot:
 	subq	$stacksize,	%rsp	// Allocate space on the stack.
 
 	// Store variables
-	movq	%rdi,	m(%rsp)
 	movl	%esi,	I0(%rsp)
 	movl	%edx,	J0(%rsp)
 	movq	baserow(%rdi),	%rax
@@ -57,14 +57,15 @@ pivot:
 	movq	%rax,	BASECOL(%rsp)
 
 	movl	cols(%rdi),	%edi
-	movq	$nodesize,	%rax
-	imulq	%rax,	%rdi	// Size of the PTR array
+	sall	$3,	%edi	// Size of the PTR array
 	call	malloc	// Allocate it.
 	movq	%rax,	PTR(%rsp)	// Set PTR
 
 	movl	I0(%rsp),	%ecx
 	salq	$5,	%rcx
 	addq	BASEROW(%rsp),	%rcx	// P0 <- LOC(BASEROW[I0])
+
+	movl	J0(%rsp),	%edx
 	movl	$-1,	%eax
 0:
 	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0)
@@ -73,24 +74,33 @@ pivot:
 	cmpl	col(%rcx),	%edx
 	ja	0b	// Are we at the right column?
 	jb	nopivot	// No need to go farther than necessary
+
 	movl	$1,	%eax
 	cvtsi2sd	%eax,	%xmm0	// ALPHA <- 1
 	movsd	val(%rcx),	%xmm1
-	divsd	%xmm1,	%xmm0	// ALPHA <- 1/VAL(P0)
+	divsd	%xmm1,	%xmm0	// ALPHA <- 1/VAL(P0).
+
 	cvtsi2sd	%eax,	%xmm1
-	movsd	%xmm1,	val(%rcx)	// VAL(P0) <- 1.0
-	movq	baserow(%rdi),	%rcx	// P0 <- LOC(BASEROW)
-	addq	%r11,	%rcx	// P0 <- LOC(BASEROW[I0]) (%r11 still holds $nodesize*I0)
-	movq	basecol(%rdi),	%r8	// Q0 <- LOC(BASEROW[0])
-	movq	$nodesize,	%r11
-	imulq	%rdx,	%r11
-	addq	%r11,	%r8	// Q0 <- LOC(BASEROW[J0]
+	movsd	%xmm1,	val(%rcx)	// VAL(P0) <- 1.0. This completes S1.
+
+	movl	I0(%rsp),	%ecx
+	salq	$5,	%rcx
+	addq	BASEROW(%rsp),	%rcx	// P0 <- LOC(BASEROW[I0])
+	movl	$-1,	%eax
+	movq	PTR(%rsp),	%rsi
 0:
 	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0)
-	movl	col(%rcx),	%r9d	// J <- COL(P0)
-	cmpl	$-1,	%r9d	// At the end of the row?
-	je	0f	// If so we are done
-	jmp 0b
+	cmpl	col(%rcx),	%eax	// Are we done?
+	je	0f
+	movl	col(%rcx),	%edx
+	salq	$5,	%rdx
+	addq	BASECOL(%rsp),	%rdx	// Calculate LOC(BASECOL[J])
+	movl	col(%rcx),	%edi
+	movq	%rdx,	(%rsi, %rdi, 8)	// PTR[J] <- LOC(BASECOL[J])
+	movsd	val(%rcx),	%xmm1
+	mulsd	%xmm0,	%xmm1
+	movsd	%xmm1,	val(%rcx)	// VAL(P0) <- ALPHA X VAL(P0)
+	jmp	0b
 0:
 	addq	$stacksize,	%rsp
 	ret
