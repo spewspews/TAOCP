@@ -23,7 +23,12 @@
 	.equ PTR, 24
 	.equ I, 32
 	.equ J, 36
-	.equ stacksize, 40
+	.equ P, 40
+	.equ P1, 48
+	.equ ALPHA, 56
+	.equ Q0, 64
+	.equ P0, 72
+	.equ stacksize, 88
 
 	.data
 neg:
@@ -37,14 +42,11 @@ neg:
  * After entry
  * %rcx is P0
  * %rdx is Q0
- * %edi is J and P (%rdi)
+ * %edi is J, J0 and P (%rdi)
  * %esi is I and P1 (%rsi)
  * %r8 is PTR
+ * %r9 is PTR[J]
  * %xmm0 is ALPHA
- * OLD STUFF BELOW
- * %r8 is Q0
- * %rdi is I
- * %r9 is J
  */
 	.text
 pivot:
@@ -73,47 +75,48 @@ pivot:
 	salq	$5,	%rcx
 	addq	BASEROW(%rsp),	%rcx	// P0 <- LOC(BASEROW[I0])
 
-	movl	J0(%rsp),	%edx
+	movl	J0(%rsp),	%edi
 	movl	$-1,	%eax
 0:
 	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0)
 	cmpl	col(%rcx),	%eax	// Have we reached the end?
 	je	nopivot	// If so there is no pivot element.
-	cmpl	col(%rcx),	%edx
+	cmpl	col(%rcx),	%edi
 	ja	0b	// Are we at the right column?
 	jb	nopivot	// No need to go farther than necessary
 
+// S1.
 	movl	$1,	%eax
 	cvtsi2sd	%eax,	%xmm0	// ALPHA <- 1
+	movsd	%xmm0,	%xmm2
 	movsd	val(%rcx),	%xmm1
 	divsd	%xmm1,	%xmm0	// ALPHA <- 1/VAL(P0).
-
-	cvtsi2sd	%eax,	%xmm1
-	movsd	%xmm1,	val(%rcx)	// VAL(P0) <- 1.0. This completes S1.
+	movsd	%xmm2,	val(%rcx)	// VAL(P0) <- 1.0.
 
 	movl	I0(%rsp),	%ecx
 	salq	$5,	%rcx
 	addq	BASEROW(%rsp),	%rcx	// P0 <- LOC(BASEROW[I0])
-	movl	$-1,	%eax
-	movq	PTR(%rsp),	%r8
-0:
-	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0)
-	cmpl	col(%rcx),	%eax	// Are we done?
-	je	0f
-	movl	col(%rcx),	%edx
+	movl	J0(%rsp),	%edx
 	salq	$5,	%rdx
-	addq	BASECOL(%rsp),	%rdx	// Calculate LOC(BASECOL[J])
+	addq	BASECOL(%rsp),	%rdx	// Q0 <- LOC(BASEROW[J0])
+
+	movq	PTR(%rsp),	%r8
+0:	// S2. Process pivot row.
+	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0)
+	movl	col(%rcx),	%eax
+	cmpl	$-1,	%eax
+	je	0f
+	movl	col(%rcx),	%eax
+	salq	$5,	%rax
+	addq	BASECOL(%rsp),	%rax	// Calculate LOC(BASECOL[J])
 	movl	col(%rcx),	%edi
-	movq	%rdx,	(%r8, %rdi, 8)	// PTR[J] <- LOC(BASECOL[J])
+	movq	%rax,	(%r8,%rdi,8)	// PTR[J] <- LOC(BASECOL[J])
 	movsd	val(%rcx),	%xmm1
 	mulsd	%xmm0,	%xmm1
 	movsd	%xmm1,	val(%rcx)	// VAL(P0) <- ALPHA X VAL(P0)
 	jmp	0b
 
-	movl	J0(%rsp),	%edx
-	salq	$5,	%rdx
-	addq	BASECOL(%rsp),	%rdx	// Q0 <- LOC(BASEROW[J0])
-0:	// S3.
+0:	// S3. Find new row.
 	movq	down(%rdx),	%rdx	// Q0 <- DOWN(Q0)
 	movl	row(%rdx),	%eax
 	cmpl	$-1,	%eax
@@ -126,7 +129,7 @@ pivot:
 	addq	BASEROW(%rsp),	%rdi	// P <- LOC(BASEROW[I])
 	movq	right(%rdi),	%rsi	// P1 <- RIGHT(P).
 
-1:	// S4.
+1:	// S4. Find new column.
 	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0).
 	movl	col(%rcx),	%eax
 	cmpl	$-1,	%eax	// Are at the end?
@@ -140,17 +143,67 @@ pivot:
 	cmpl	J0(%rsp),	%eax	// Process the pivot column at the end.
 	je	1b
 
+	movl	%eax,	J(%rsp)
 2:	// S5.
 	cmpl	col(%rsi),	%eax
-	ja	1f	// COL(P1) < J ?
+	jb	3f	// COL(P1) > J ?
 	je	2f	// COL(P1) = J ?
 	movq	%rsi,	%rdi	// P <- P1
 	movq	right(%rdi),	%rsi	// P1 <- RIGHT(P)
 	jmp	2b
 
-1:	// S6.
+3:
+	movq	(%r8,%rax,8),	%r9	// PTR[J]
+	movl	I(%rsp),	%eax
+3:	// S6.
+	movq	down(%r9),	%r10
+	cmpl	row(%r10),	%eax
+	jb	3f	//	ROW(DOWN(PTR[J])) > I?
+	movq	%r10,	%r9
+	jmp 3b
+3:
+	movl	J(%rsp),	%eax
+	movq	%r9,	(%r8,%rax,8)
+	movq	%rcx,	P0(%rsp)
+	movq	%rdx,	Q0(%rsp)
+	movq	%rdi,	P(%rsp)
+	movq	%rsi,	P1(%rsp)
+	movsd	%xmm0,	ALPHA(%rsp)
+	movq	$nodesize,	%rdi
+	call	malloc	// X <= AVAIL
+	movq	P0(%rsp),	%rcx
+	movq	Q0(%rsp),	%rdx
+	movq	P(%rsp),	%rdi
+	movq	P1(%rsp),	%rsi
+	movsd	ALPHA(%rsp),	%xmm0
+	movq	PTR(%rsp),	%r8
+	movl	J(%rsp),	%r10d
+	movq	(%r8,%r10,8),	%r9
 
+	movq	%rsi,	right(%rax)	// RIGHT(X) <- P1
+	movq	%rax,	%rsi	// P1 <- X
+	movq	%rsi,	right(%rdi)	// RIGHT(P) <- X
+	movq	down(%r9),	%rax
+	movq	%rax,	down(%rsi)	// DOWN(X) <- DOWN(PTR[J])
+	movq	%rsi,	down(%r9)	// DOWN(PTR[J]) <- X
+	xorpd	%xmm1,	%xmm1
+	movsd	%xmm1,	val(%rsi)	// VAL(X) <- 0
+	movl	I(%rsp),	%eax
+	movl	%eax,	row(%rsi)	// ROW(X) <- I
+	movl	J(%rsp),	%eax
+	movl	%eax,	col(%rsi)	// COL(X) <- J
+	
 2:	// S7.
+	movsd	val(%rcx),	%xmm1
+	mulsd	val(%rdx),	%xmm1
+	movsd	val(%rsi),	%xmm2
+	subsd	%xmm1,	%xmm2
+	movsd	%xmm2,	val(%rsi)	// VAL(P1) <- VAL(P1) - VAL(P0) * VAL(Q0)
+	movl	J(%rsp),	%eax
+	movq	%rsi,	(%r8,%rax,8)	// PTR[J] <- P1
+	movq	%rsi,	%rdi	// P <- P1
+	movq	right(%rdi),	%rsi	// P1 <- RIGHT(P)
+	jmp	1b	// To S4.
 
 nopivot:
 	addq	$stacksize,	%rsp
