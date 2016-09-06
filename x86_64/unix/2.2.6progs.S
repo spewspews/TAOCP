@@ -145,7 +145,6 @@ pivot:
 	cmpl	J0(%rsp),	%r11d	// Process the pivot column at the end.
 	je	1b
 
-	movl	%r11d,	J(%rsp)
 2:	// S5.
 	cmpl	col(%rsi),	%r11d
 	jb	3f	// COL(P1) > J ?
@@ -165,6 +164,7 @@ pivot:
 	jmp 3b
 3:
 	movq	%r9,	(%r8,%r11,8)	// Save PTR[J].
+	movl	%r11d,	J(%rsp)
 	movq	%rcx,	P0(%rsp)
 	movq	%rdx,	Q0(%rsp)
 	movq	%rdi,	P(%rsp)
