@@ -140,7 +140,7 @@ matrixfmt(Fmt *fmt)
 				n = n->right;
 			}
 			else
-				r = fmtprint(fmt, "0%c", c);
+				r = fmtprint(fmt, "N%c", c);
 
 			if(r == -1)
 				return -1;

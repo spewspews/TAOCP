@@ -46,6 +46,8 @@ neg:
  * %esi is I and P1 (%rsi)
  * %r8 is PTR
  * %r9 is PTR[J]
+ * %r10 is DOWN(PTR[J])
+ * %r11 is J
  * %xmm0 is ALPHA
  */
 	.text
@@ -131,8 +133,8 @@ pivot:
 
 1:	// S4. Find new column.
 	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0).
-	movl	col(%rcx),	%eax
-	cmpl	$-1,	%eax	// Are at the end?
+	movl	col(%rcx),	%r11d
+	cmpl	$-1,	%r11d	// Are at the end?
 	jne	2f
 	movsd	val(%rdx),	%xmm1
 	xorpd	neg,	%xmm1	// Flip the sign bit.
@@ -140,12 +142,12 @@ pivot:
 	movsd	%xmm1,	val(%rdx)	// VAL(Q0) <- -ALPHA * VAL(Q0).
 	jmp	0b
 2:
-	cmpl	J0(%rsp),	%eax	// Process the pivot column at the end.
+	cmpl	J0(%rsp),	%r11d	// Process the pivot column at the end.
 	je	1b
 
-	movl	%eax,	J(%rsp)
+	movl	%r11d,	J(%rsp)
 2:	// S5.
-	cmpl	col(%rsi),	%eax
+	cmpl	col(%rsi),	%r11d
 	jb	3f	// COL(P1) > J ?
 	je	2f	// COL(P1) = J ?
 	movq	%rsi,	%rdi	// P <- P1
@@ -153,7 +155,7 @@ pivot:
 	jmp	2b
 
 3:
-	movq	(%r8,%rax,8),	%r9	// PTR[J]
+	movq	(%r8,%r11,8),	%r9	// PTR[J]
 	movl	I(%rsp),	%eax
 3:	// S6.
 	movq	down(%r9),	%r10
@@ -162,8 +164,7 @@ pivot:
 	movq	%r10,	%r9
 	jmp 3b
 3:
-	movl	J(%rsp),	%eax
-	movq	%r9,	(%r8,%rax,8)
+	movq	%r9,	(%r8,%r11,8)	// Save PTR[J].
 	movq	%rcx,	P0(%rsp)
 	movq	%rdx,	Q0(%rsp)
 	movq	%rdi,	P(%rsp)
@@ -177,8 +178,8 @@ pivot:
 	movq	P1(%rsp),	%rsi
 	movsd	ALPHA(%rsp),	%xmm0
 	movq	PTR(%rsp),	%r8
-	movl	J(%rsp),	%r10d
-	movq	(%r8,%r10,8),	%r9
+	movl	J(%rsp),	%r11d
+	movq	(%r8,%r11,8),	%r9
 
 	movq	%rsi,	right(%rax)	// RIGHT(X) <- P1
 	movq	%rax,	%rsi	// P1 <- X
@@ -199,8 +200,7 @@ pivot:
 	movsd	val(%rsi),	%xmm2
 	subsd	%xmm1,	%xmm2
 	movsd	%xmm2,	val(%rsi)	// VAL(P1) <- VAL(P1) - VAL(P0) * VAL(Q0)
-	movl	J(%rsp),	%eax
-	movq	%rsi,	(%r8,%rax,8)	// PTR[J] <- P1
+	movq	%rsi,	(%r8,%r11,8)	// PTR[J] <- P1
 	movq	%rsi,	%rdi	// P <- P1
 	movq	right(%rdi),	%rsi	// P1 <- RIGHT(P)
 	jmp	1b	// To S4.
