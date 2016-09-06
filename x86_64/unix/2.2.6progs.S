@@ -42,12 +42,12 @@ neg:
  * After entry
  * %rcx is P0
  * %rdx is Q0
- * %edi is J, J0 and P (%rdi)
- * %esi is I and P1 (%rsi)
+ * %rdi is P
+ * %rsi is P1
  * %r8 is PTR
  * %r9 is PTR[J]
  * %r10 is DOWN(PTR[J])
- * %r11 is J
+ * %r11 is J and J0
  * %xmm0 is ALPHA
  */
 	.text
@@ -77,13 +77,13 @@ pivot:
 	salq	$5,	%rcx
 	addq	BASEROW(%rsp),	%rcx	// P0 <- LOC(BASEROW[I0])
 
-	movl	J0(%rsp),	%edi
+	movl	J0(%rsp),	%r11d
 	movl	$-1,	%eax
 0:
 	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0)
 	cmpl	col(%rcx),	%eax	// Have we reached the end?
 	je	nopivot	// If so there is no pivot element.
-	cmpl	col(%rcx),	%edi
+	cmpl	col(%rcx),	%r11d
 	ja	0b	// Are we at the right column?
 	jb	nopivot	// No need to go farther than necessary
 
@@ -110,8 +110,8 @@ pivot:
 	je	0f
 	salq	$5,	%rax
 	addq	BASECOL(%rsp),	%rax	// Calculate LOC(BASECOL[J])
-	movl	col(%rcx),	%edi
-	movq	%rax,	(%r8,%rdi,8)	// PTR[J] <- LOC(BASECOL[J])
+	movl	col(%rcx),	%r11d
+	movq	%rax,	(%r8,%r11,8)	// PTR[J] <- LOC(BASECOL[J])
 	movsd	val(%rcx),	%xmm1
 	mulsd	%xmm0,	%xmm1
 	movsd	%xmm1,	val(%rcx)	// VAL(P0) <- ALPHA X VAL(P0)
