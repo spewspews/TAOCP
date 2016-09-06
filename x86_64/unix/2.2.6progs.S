@@ -108,7 +108,6 @@ pivot:
 	movl	col(%rcx),	%eax
 	cmpl	$-1,	%eax
 	je	0f
-	movl	col(%rcx),	%eax
 	salq	$5,	%rax
 	addq	BASECOL(%rsp),	%rax	// Calculate LOC(BASECOL[J])
 	movl	col(%rcx),	%edi
