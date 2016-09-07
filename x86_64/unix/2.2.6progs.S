@@ -24,21 +24,25 @@
 	.equ I, 32
 	.equ J, 36
 	.equ P, 40
-	.equ P1, 48
-	.equ ALPHA, 56
-	.equ Q0, 64
-	.equ P0, 72
+	.equ ALPHA, 48
+	.equ Q0, 56
+	.equ P0, 64
+	.equ EPSILON, 72
 	.equ stacksize, 88
 
 	.data
 neg:
 	.quad	0x8000000000000000
+	.quad	0
+pos:
+	.quad	0x7fffffffffffffff
 
 /* 
  * On entry
  * %rdi points to the Matrix m
  * %esi is the row of the pivot I0.
  * %edx is the col of the pivot J0.
+ * %xmm0 is epsilon
  * After entry
  * %rcx is P0
  * %rdx is Q0
@@ -47,7 +51,7 @@ neg:
  * %r8 is PTR
  * %r9 is PTR[J]
  * %r10 is DOWN(PTR[J])
- * %r11 is J and J0
+ * %r11 is J (and briefly J0)
  * %xmm0 is ALPHA
  */
 	.text
@@ -61,6 +65,7 @@ pivot:
 	subq	$stacksize,	%rsp	// Allocate space on the stack.
 
 	// Store variables
+	movsd	%xmm0,	EPSILON(%rsp)
 	movl	%esi,	I0(%rsp)
 	movl	%edx,	J0(%rsp)
 	movq	baserow(%rdi),	%rax
@@ -133,7 +138,7 @@ pivot:
 1:	// S4. Find new column.
 	movq	right(%rcx),	%rcx	// P0 <- RIGHT(P0).
 	movl	col(%rcx),	%r11d
-	cmpl	$-1,	%r11d	// Are at the end?
+	cmpl	$-1,	%r11d	// At the end?
 	jne	2f
 	movsd	val(%rdx),	%xmm1
 	xorpd	neg,	%xmm1	// Flip the sign bit.
@@ -167,14 +172,13 @@ pivot:
 	movq	%rcx,	P0(%rsp)
 	movq	%rdx,	Q0(%rsp)
 	movq	%rdi,	P(%rsp)
-	movq	%rsi,	P1(%rsp)
 	movsd	%xmm0,	ALPHA(%rsp)
 	movq	$nodesize,	%rdi
 	call	malloc	// X <= AVAIL
 	movq	P0(%rsp),	%rcx
 	movq	Q0(%rsp),	%rdx
 	movq	P(%rsp),	%rdi
-	movq	P1(%rsp),	%rsi
+	movq	right(%rdi),	%rsi
 	movsd	ALPHA(%rsp),	%xmm0
 	movq	PTR(%rsp),	%r8
 	movl	J(%rsp),	%r11d
@@ -198,11 +202,40 @@ pivot:
 	mulsd	val(%rdx),	%xmm1
 	movsd	val(%rsi),	%xmm2
 	subsd	%xmm1,	%xmm2
-	movsd	%xmm2,	val(%rsi)	// VAL(P1) <- VAL(P1) - VAL(P0) * VAL(Q0)
+	movsd	%xmm2,	val(%rsi)	// VAL(P1) <- VAL(P1)-VAL(P0)*VAL(Q0)
+	andpd	pos,	%xmm2
+	ucomisd	EPSILON(%rsp),	%xmm2
+	jb	2f	// |VAL(P1)| < epsilon ?
 	movq	%rsi,	(%r8,%r11,8)	// PTR[J] <- P1
 	movq	%rsi,	%rdi	// P <- P1
 	movq	right(%rdi),	%rsi	// P1 <- RIGHT(P)
 	jmp	1b	// To S4.
+
+2:
+	movq	(%r8,%r11,8),	%r9
+2:
+	cmpq	down(%r9),	%rsi
+	je	2f
+	movq	down(%r9),	%r9
+	jmp 2b
+2:
+	movq	down(%r9),	%r10
+	movq	down(%rsi),	%rax
+	movq	%rax,	down(%r9)	// DOWN(PTR[J]) <- DOWN(P1)
+	movq	right(%rsi),	%rax
+	movq	%rax,	right(%rdi)	// RIGHT(P) <- RIGHT(P1)
+	movq	%r9,	(%r8,%r11,8)	// Save PTR[j]
+	movq	%rcx,	P0(%rsp)
+	movq	%rdx,	Q0(%rsp)
+	movq	%rdi,	P(%rsp)
+	movq	%r10,	%rdi
+	call	free
+	movq	PTR(%rsp),	%r8
+	movq	P0(%rsp),	%rcx
+	movq	Q0(%rsp),	%rdx
+	movq	P(%rsp),	%rdi
+	movq	right(%rdi),	%rsi	// P1 <- RIGHT(P)
+	jmp	1b
 
 nopivot:
 	addq	$stacksize,	%rsp
