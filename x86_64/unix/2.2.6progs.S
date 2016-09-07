@@ -150,6 +150,7 @@ pivot:
 	cmpl	J0(%rsp),	%r11d	// Process the pivot column at the end.
 	je	1b
 
+	movq	(%r8,%r11,8),	%r9	// PTR[J]
 2:	// S5.
 	cmpl	col(%rsi),	%r11d
 	jb	3f	// COL(P1) > J ?
@@ -159,7 +160,6 @@ pivot:
 	jmp	2b
 
 3:
-	movq	(%r8,%r11,8),	%r9	// PTR[J]
 	movl	I(%rsp),	%eax
 3:	// S6.
 	movq	down(%r9),	%r10
@@ -213,8 +213,6 @@ pivot:
 	movq	right(%rdi),	%rsi	// P1 <- RIGHT(P)
 	jmp	1b	// To S4.
 
-2:
-	movq	(%r8,%r11,8),	%r9
 2:
 	cmpq	down(%r9),	%rsi
 	je	2f
