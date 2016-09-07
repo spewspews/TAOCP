@@ -98,6 +98,7 @@ pivot:
 	movsd	%xmm0,	%xmm2
 	movsd	val(%rcx),	%xmm1
 	divsd	%xmm1,	%xmm0	// ALPHA <- 1/VAL(P0).
+	movsd	%xmm0,	ALPHA(%rsp)
 	movsd	%xmm2,	val(%rcx)	// VAL(P0) <- 1.0.
 
 	movl	I0(%rsp),	%ecx
@@ -167,22 +168,23 @@ pivot:
 	movq	%r10,	%r9
 	jmp 3b
 3:
-	movq	%r9,	(%r8,%r11,8)	// Save PTR[J].
 	movl	%r11d,	J(%rsp)
+	movq	%r9,	(%r8,%r11,8)	// Save PTR[J].
 	movq	%rcx,	P0(%rsp)
 	movq	%rdx,	Q0(%rsp)
 	movq	%rdi,	P(%rsp)
-	movsd	%xmm0,	ALPHA(%rsp)
+
 	movq	$nodesize,	%rdi
 	call	malloc	// X <= AVAIL
-	movq	P0(%rsp),	%rcx
-	movq	Q0(%rsp),	%rdx
-	movq	P(%rsp),	%rdi
-	movq	right(%rdi),	%rsi
+
 	movsd	ALPHA(%rsp),	%xmm0
 	movq	PTR(%rsp),	%r8
 	movl	J(%rsp),	%r11d
 	movq	(%r8,%r11,8),	%r9
+	movq	P0(%rsp),	%rcx
+	movq	Q0(%rsp),	%rdx
+	movq	P(%rsp),	%rdi
+	movq	right(%rdi),	%rsi
 
 	movq	%rsi,	right(%rax)	// RIGHT(X) <- P1
 	movq	%rax,	%rsi	// P1 <- X
@@ -224,13 +226,17 @@ pivot:
 	movq	%rax,	down(%r9)	// DOWN(PTR[J]) <- DOWN(P1)
 	movq	right(%rsi),	%rax
 	movq	%rax,	right(%rdi)	// RIGHT(P) <- RIGHT(P1)
+
 	movq	%r9,	(%r8,%r11,8)	// Save PTR[j]
 	movq	%rcx,	P0(%rsp)
 	movq	%rdx,	Q0(%rsp)
 	movq	%rdi,	P(%rsp)
+
 	movq	%r10,	%rdi
 	call	free
+
 	movq	PTR(%rsp),	%r8
+	movsd	ALPHA(%rsp),	%xmm0
 	movq	P0(%rsp),	%rcx
 	movq	Q0(%rsp),	%rdx
 	movq	P(%rsp),	%rdi
