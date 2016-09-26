@@ -38,11 +38,9 @@ pivot(Matrix *m, unsigned int i0, unsigned int j0, double epsilon)
 			return -1;
 	}
 
-	// S1.
 	alpha = 1.0 / p0->val;
 	p0->val = 1.0;
 
-	// S2. process pivot row.
 	for(p0 = m->baserow[i0].right; p0->col != (unsigned int)-1; p0 = p0->right) {
 		ptr[p0->col] = m->basecol + p0->col;
 		p0->val *= alpha;
@@ -66,25 +64,24 @@ pivot(Matrix *m, unsigned int i0, unsigned int j0, double epsilon)
 				while(ptr[j]->down->row < i)
 					ptr[j] = ptr[j]->down;
 				x = malloc(sizeof(*x));
+				x->val = 0.0;
 				x->row = i;
 				x->col = j;
 				x->right = p1;
 				x->down = ptr[j]->down;
 				ptr[j]->down = x;
 				p->right = x;
+				p1 = x;
 			}
 			p1->val -= p0->val * q0->val;
-			if(fabs(p1->val) >= epsilon) {
-				ptr[j] = p1;
-				p = p1;
-			} else {
+			if(fabs(p1->val) < epsilon) {
 				while(ptr[j]->down != p1)
 					ptr[j] = ptr[j]->down;
 				ptr[j]->down = p1->down;
 				p->right = p1->right;
 				free(p1);
-			}
-			p1 = p->right;
+			} else
+				ptr[j] = p1;
 		}
 		q0->val *= -alpha;
 	}

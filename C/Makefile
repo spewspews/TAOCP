@@ -14,4 +14,4 @@ LDLIBS = -lfmt -lutf
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm *.o 2.2.3progt 2.2.4proga 2.2.6progs
+	rm -f *.o 2.2.3progt 2.2.4proga 2.2.6progs
