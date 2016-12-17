@@ -17,11 +17,11 @@ int arr[] = {
 };
 
 int
-main(int argc, char **argv)
+main(void)
 {
-	int ret;
+	int i;
 
-	ret = topsort(arr, 9);
-	print("got %d\n", ret);
+	i = topsort(arr, 9);
+	printf("got %d\n", i);
 	exit(0);
 }
