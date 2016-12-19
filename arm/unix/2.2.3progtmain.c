@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int topsort(int*, int);
+int *topsort(int*, int);
 int arr[] = {
 	9, 2,
 	3, 7,
@@ -17,11 +17,13 @@ int arr[] = {
 };
 
 int
-main(int argc, char **argv)
+main(void)
 {
-	int ret;
+	int *ret, *i;
 
 	ret = topsort(arr, 9);
-	print("got %d\n", ret);
+	for(i = ret; *i != 0; i++)
+		printf("%d ", *i);
+	printf("\n");
 	exit(0);
 }
