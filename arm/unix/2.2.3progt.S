@@ -1,18 +1,18 @@
-	.global topsort
-	.equ count, 0
-	.equ qlink, 0
-	.equ top, 4
-	.equ j, 0
-	.equ k, 4
-	.equ suc, 0
-	.equ next, 4
-	.equ bp, 0
-	.equ n, 4
+	.global	topsort
+	.equ	count,	0
+	.equ	qlink,	0
+	.equ	top,	4
+	.equ	j,	0
+	.equ	k,	4
+	.equ	suc,	0
+	.equ	next,	4
+	.equ	bp,	0
+	.equ	n,	4
 
 	.bss
-	.align 2
+	.align	2
 x:
-	.space 1024*8
+	.space	1024*8
 
 /*
  * On entry:
@@ -30,7 +30,7 @@ x:
  */
 
 	.text
-	.align 2
+	.align	2
 topsort:
 	push	{r0,r1,r4-r7}		// Save buffer pointer, n, and variable registers.
 	movw	r4,	#:lower16:x
