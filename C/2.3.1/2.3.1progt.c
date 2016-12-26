@@ -1,30 +1,40 @@
 #include <u.h>
 #include <libc.h>
-#include "2.3.1.h"
+
+enum{ MAXRECUR = 1000 };
+
+typedef struct Node Node;
+
+struct Node
+{
+	Node	*left;
+	Node	*right;
+};
+
+#define push(p)	\
+	if(sp == ep)	\
+		exits("Stack overflow");	\
+	else	\
+		*sp++ = (p)
+#define pop(p) (p) = *--sp
 
 void
-inorder(Tree *p, void (*visit)(Tree *))
+inorder(Node *p, void(*visit)(Node*))
 {
-	int s;
+	static Node *a[MAXRECUR], **sp, **ep;
 
-	s = 0;
-	if(p == nil)
-		return;
-	for(;;){
-		do{
-			if(s == MAXRECUR)
-				exits("Recursion depth exceeded");
-			a[s++] = p;
-			p = p->left;
-		}while(p != nil);
-		for(;;){
-			p = a[--s];
+	sp = a;
+	ep = sp + MAXRECUR;
+	for(;;) {
+		if(p == nil) {
+			if(sp == a)
+				return;
+			pop(p);
 			visit(p);
 			p = p->right;
-			if(p != nil)
-				break;
-			if(s == 0)
-				return;
+		} else {
+			push(p);
+			p = p->left;
 		}
 	}
 }
