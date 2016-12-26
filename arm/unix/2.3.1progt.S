@@ -27,8 +27,8 @@ inorder:
 T1:	push	{r4-r8}
 	mov	r4,	r0
 	mov	r5,	r1
-	movw	r6,	#:lower16:x
-	movt	r6,	#:upper16:x
+	movw	r6,	#:lower16:a
+	movt	r6,	#:upper16:a
 	mov	r8,	r6
 	add	r7,	r6, #asize
 T2:	cmp	r4,	#0
