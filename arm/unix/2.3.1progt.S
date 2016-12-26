@@ -38,11 +38,10 @@ T3:	cmp	r6,	r7
 	str	r4,	[r6], #4
 	ldr	r4,	[r4, #left]
 	b	T2
-T4:
-	cmp	r6,	r8
+T4:	cmp	r6,	r8
 	beq	RET
 	ldr	r4,	[r6, #-4]!
-	blx	r5
+T5:	blx	r5
 	ldr	r4,	[r4, #right]
 	b	T2
 
