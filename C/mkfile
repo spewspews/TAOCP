@@ -1,0 +1,6 @@
+</$objtype/mkfile
+
+BIN = .
+TARG = 2.3.1progt
+
+</sys/src/cmd/mkmany
