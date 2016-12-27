@@ -1,5 +1,6 @@
 CFLAGS = -Wall -Wextra -g
-LDLIBS = -lfmt -lutf
+LDLIBS=
+LDFLAGS=-static
 
 1.4.2: u1.4.2.o
 	$(CC) -static -o 1.4.2 $^
@@ -23,11 +24,7 @@ progp: uprogp.S
 2.2.6progs:	2.2.6progsmain.o 2.2.6progs.o
 	$(CC) -o $@ $^ $(LDLIBS)
 
-.S.o:
-	$(CC) -g -c -o $@ $<
-
-.c.o:
-	$(CC) $(CFLAGS) -c -o $@ $<
+2.3.1progt: 2.3.1progt.o 2.3.1progtmain.o
 
 clean:
-	rm -f *.o 2.2.3progt progm 2.2.4proga 2.2.6progs
+	rm -f *.o 2.2.3progt progm 2.2.4proga 2.2.6progs 2.3.1progt
