@@ -3,8 +3,7 @@
 	.equ	asize,	8000
 
 	.bss
-a:
-	.space	asize
+a:	.space	asize
 
 /*
  * On entry:
