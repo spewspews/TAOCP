@@ -16,7 +16,7 @@
 	.arm
 inorder:
 S0:	cmp	r0,	#0		// 1
-	bxeq	lr			// 1
+	bxeq	lr			// 0
 	push	{r4, r5, lr}		// 1
 	mov	r4,	r0		// 1
 	mov	r5,	r1		// 1
@@ -37,6 +37,6 @@ S2:	ldr	r0,	[r4, #left]	// n-1	Q ← LEFT(P)
 2:	mov	r4,	r0		// a-1	P ← Q
 	b	S2			// a-1
 
-// Running time is 7n + 4a + 6
+// Running time is 7n + 4a + 5
 // n number of nodes, a number of nodes with no right child.
 // I count a branch only if it is taken.
