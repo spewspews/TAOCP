@@ -49,7 +49,7 @@ main(void)
 	srand(time(NULL));
 	r = NULL;
 	for(a = pool; a < pool + nelem(pool); a++) {
-		a->val = (double)rand() / RAND_MAX * 1000;
+		a->val = (double)rand() / RAND_MAX * 1000000;
 		printf("Inserting %d.\n", a->val);
 		r = insert(r, a);
 	}
