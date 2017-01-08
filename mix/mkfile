@@ -1,0 +1,13 @@
+</$objtype/mkfile
+
+TARG=genrands
+BIN=.
+CLEANFILES=2.3.1progspool.m
+
+</sys/src/cmd/mkmany
+
+2.3.1progspool.m:	genrands.install
+	genrands > 2.3.1progspool.m
+
+run:V:	2.3.1progspool.m
+	games/mix -g 2.3.1progspool.m 2.3.1progsmain.m 2.3.1progs.m
