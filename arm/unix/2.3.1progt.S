@@ -1,11 +1,5 @@
 	.equ	left,	0
 	.equ	right,	4
-	.equ	asize,	1000
-
-	.bss
-	.align	4
-a:
-	.space	asize
 
 /*
  * On entry:

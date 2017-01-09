@@ -1,9 +1,5 @@
 	.equ	left,	0
 	.equ	right,	8
-	.equ	asize,	1000
-
-	.bss
-a:	.space	asize
 
 /*
  * On entry:
