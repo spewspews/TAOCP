@@ -15,28 +15,28 @@
 	.text
 	.global inorder
 inorder:
-T1:	cmpq	$0,	%rdi
+T1:	cmp	$0,	%rdi
 	jne	T2A
 	ret
-T2A:	pushq	%rbx
-	pushq	%rbp
-	pushq	%r12
-	movq	%rdi,	%rbx
-	movq	%rsi,	%rbp
-	movq	%rsp,	%r12
-T3:	pushq	%rbx
-	movq	left(%rbx),	%rbx
-T2B:	cmpq	$0,	%rbx
+T2A:	push	%rbx
+	push	%rbp
+	push	%r12
+	mov	%rdi,	%rbx
+	mov	%rsi,	%rbp
+	mov	%rsp,	%r12
+T3:	push	%rbx
+	mov	left(%rbx),	%rbx
+T2B:	cmp	$0,	%rbx
 	jne	T3
-T4:	popq	%rbx
-T5:	movq	%rbx,	%rdi
-	callq	*%rbp
-	movq	right(%rbx),	%rbx
-T2C:	cmpq	$0,	%rbx
+T4:	pop	%rbx
+T5:	mov	%rbx,	%rdi
+	call	*%rbp
+	mov	right(%rbx),	%rbx
+T2C:	cmp	$0,	%rbx
 	jne	T3
-	cmpq	%rsp,	%r12
+	cmp	%rsp,	%r12
 	jne	T4
-	popq	%r12
-	popq	%rbp
-	popq	%rbx
+	pop	%r12
+	pop	%rbp
+	pop	%rbx
 	ret
