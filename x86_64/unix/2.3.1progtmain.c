@@ -35,12 +35,6 @@ printnode(Node *r)
 
 Node pool[100];
 
-void
-debug(int d)
-{
-	printf("here at %d\n", d);
-}
-
 int
 main(void)
 {
