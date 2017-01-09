@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Wextra -g
+CFLAGS=-Wall -Wextra -Wpedantic -O2
 LDLIBS=
 LDFLAGS=-static
 
