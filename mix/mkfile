@@ -2,12 +2,15 @@
 
 TARG=genrands
 BIN=.
-CLEANFILES=2.3.1progspool.m
+CLEANFILES=2.3.1pool.m
 
 </sys/src/cmd/mkmany
 
-2.3.1progspool.m:	genrands.install
-	genrands > 2.3.1progspool.m
+2.3.1pool.m:	genrands.install
+	genrands > 2.3.1pool.m
 
-run:V:	2.3.1progspool.m
-	games/mix -g 2.3.1progspool.m 2.3.1progsmain.m 2.3.1progs.m
+runprogs:V:	2.3.1pool.m
+	games/mix -g 2.3.1pool.m 2.3.1progsmain.m 2.3.1progs.m
+
+runprogt:V:	2.3.1pool.m
+	games/mix -g 2.3.1pool.m 2.3.1progtmain.m 2.3.1progt.m
