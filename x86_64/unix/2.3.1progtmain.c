@@ -17,13 +17,36 @@ void inorder(Node*, void(*)(Node*));
 Node*
 insert(Node *r, Node *n)
 {
+	Node *p, *q;
+
+	n->right = NULL;
+	n->left = NULL;
+
 	if(r == NULL)
 		return n;
 
-	if(n->val > r->val)
-		r->right = insert(r->right, n);
-	else if (n->val < r->val)
-		r->left = insert(r->left, n);
+	q = r;
+	for(;;) {
+		p = q;
+		if(n->val > p->val) {
+			q = p->right;
+			if(q == NULL) {
+				p->right = n;
+				break;
+			}
+			continue;
+		}
+		if(n->val < p->val) {
+			q = p->left;
+			if(q == NULL) {
+				p->left = n;
+				break;
+			}
+			continue;
+		}
+		break;
+	}
+
 	return r;
 }
 
