@@ -15,7 +15,7 @@ main(int argc, char **argv)
 	else
 		n = strtol(argv[1], nil, 10);
 
-	print("POOL\tEQU\t1\nORIG\tPOOL\n");
+	print("POOL\tEQU\t1\n\tORIG\tPOOL\n");
 
 	srand(time(nil));
 	for(i = 0; i < n-1; i++) {

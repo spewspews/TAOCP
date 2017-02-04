@@ -26,27 +26,26 @@ insert(Node *r, Node *n)
 		return n;
 
 	q = r;
-	for(;;) {
-		p = q;
-		if(n->val > p->val) {
-			q = p->right;
-			if(q == NULL) {
-				p->right = n;
-				break;
-			}
-			continue;
-		}
-		if(n->val < p->val) {
-			q = p->left;
-			if(q == NULL) {
-				p->left = n;
-				break;
-			}
-			continue;
-		}
-		break;
-	}
 
+Loop:
+	p = q;
+	if(n->val > p->val) {
+		q = p->right;
+		if(q == NULL) {
+			p->right = n;
+			goto End;
+		}
+		goto Loop;
+	}
+	if(n->val < p->val) {
+		q = p->left;
+		if(q == NULL) {
+			p->left = n;
+			goto End
+		}
+		goto Loop;
+	}
+End:
 	return r;
 }
 
