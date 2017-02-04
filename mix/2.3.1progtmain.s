@@ -24,8 +24,8 @@ VISIT	STJ	1F
 	OUT	BUF(19)
 1H	JMP	*
 
-# Insertion into binary tree at HEAD
-# ri1 points to the node to insert.
+* Insertion into binary tree at HEAD
+* ri1 points to the node to insert.
 LINK	EQU	1:2
 INSERT	STJ	2F
 	LD3	HEAD		# P ← HEAD
