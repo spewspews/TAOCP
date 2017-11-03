@@ -9,8 +9,5 @@ CLEANFILES=2.3.1pool.s `{ls *.mixal *.mix >[2]/dev/null}
 2.3.1pool.s:	genrands.install
 	genrands > 2.3.1pool.s
 
-runprog([st]):RV:	2.3.1pool.s
-	games/mix -g 2.3.1pool.s 2.3.1prog$stem1^main.s 2.3.1prog$stem1.s
-
-2.3.1prog([st]).mixal:R:	2.3.1pool.s 2.3.1prog\1.s 2.3.1prog\1main.s
-	cat 2.3.1pool.s 2.3.1prog$stem1^main.s 2.3.1prog$stem1.s > 2.3.1prog$stem1.mixal
+2.3.1prog%.mixal:R:	2.3.1pool.s 2.3.1prog%.s 2.3.1prog%main.s
+	cat $^ > $@

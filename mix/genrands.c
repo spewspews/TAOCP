@@ -10,10 +10,8 @@ main(int argc, char **argv)
 {
 	int i, n;
 
-	if(argc != 2)
-		n = 100;
-	else
-		n = strtol(argv[1], nil, 10);
+	if(argc != 2) n = 100;
+	else          n = strtol(argv[1], nil, 10);
 
 	print("POOL\tEQU\t1\n\tORIG\tPOOL\n");
 
