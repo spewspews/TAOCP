@@ -17,7 +17,7 @@ int arr[] = {
 };
 
 int
-main(int argc, char **argv)
+main(void)
 {
 	int *ret, *i;
 

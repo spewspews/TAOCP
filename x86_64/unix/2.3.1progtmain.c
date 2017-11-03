@@ -41,7 +41,7 @@ Loop:
 		q = p->left;
 		if(q == NULL) {
 			p->left = n;
-			goto End
+			goto End;
 		}
 		goto Loop;
 	}

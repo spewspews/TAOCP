@@ -2,6 +2,8 @@ CFLAGS=-Wall -Wextra -Wpedantic -O2
 LDLIBS=
 LDFLAGS=-static
 
+all: 2.2.3progt 2.2.4proga 2.3.1progt 2.3.1progs
+
 2.2.3progt: 2.2.3progt.o 2.2.3progtmain.o
 
 2.2.4proga: 2.2.4proga.o 2.2.4progamain.o
