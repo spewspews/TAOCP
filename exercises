@@ -26,8 +26,8 @@ P0  STJ  1F
     LD5  0,5(LLINKT)
     J5NN 1F
 P1  LD5N 1,5(RLINKT)
-	J5NN P1
-	ENN5 0,5
+    J5NN P1
+    ENN5 0,5
 1H  JMP *
 
 Out of curiosity Algorithm S alone implemented in MIX:
@@ -35,7 +35,7 @@ LLINKT EQU 0:2
 RLINKT EQU 0:2
 S0  STJ  1F
     LD5N 1,5(RLINKT)
-	J5NN 1F
+    J5NN 1F
     ENN6 0,5
 S2  ENT5 0,6
     LD6  0,5(LLINKT)
