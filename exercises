@@ -1,3 +1,47 @@
+2.3.1.17:
+Algorithm P: (preorder successor in a threaded binary tree). If P points
+to a node of a threaded binary tree, this algorithm sets Q ← P*.
+P1. If LTAG(P) = 1, go to P2. Otherwise set Q ← LLINK(P) and terminate the
+    algorithm.
+P2. Set Q ← RLINK(P). If RTAG(P) = 1, repeat this step. Otherwise the algorithm
+    terminates.
+
+What follows is a program implementing this algorithm in C:
+struct Node {
+	struct Node *left, *right;
+	char ltag, rtag;
+};
+struct Node*
+preorder(struct Node *p)
+{
+	if(!p->ltag) return p->left;
+	while(p->rtag) p = p->right;
+	return p->right;
+}
+
+And a program implementing the algorithm in MIX:
+LLINKT EQU 0:2
+RLINKT EQU 0:2
+P0  STJ  1F
+    LD5  0,5(LLINKT)
+    J5NN 1F
+P1  LD5N 1,5(RLINKT)
+	J5NN P1
+	ENN5 0,5
+1H  JMP *
+
+Out of curiosity Algorithm S alone implemented in MIX:
+LLINKT EQU 0:2
+RLINKT EQU 0:2
+S0  STJ  1F
+    LD5N 1,5(RLINKT)
+	J5NN 1F
+    ENN6 0,5
+S2  ENT5 0,6
+    LD6  0,5(LLINKT)
+    J6NN S2
+1H  JMP *
+
 2.3.1.29:
 Define the preorder successor node of a subtree S of a tree T to be
 the first node visited in a preorder traversal of T after all the
