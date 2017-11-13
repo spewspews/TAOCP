@@ -1,0 +1,24 @@
+2.3.1.29:
+Define the preorder successor node of a subtree S of a tree T to be
+the first node visited in a preorder traversal of T after all the
+nodes of S have been visited.
+
+Lemma: Starting at step C2 with P set to the root of tree T and Q set
+to the root of tree S with empty left and right nodes, the algorithm will
+copy INFO(P) to INFO(Q) and with the
+the left and right subtrees of P copied to the left and right
+subtrees of Q and then be at step C6 with P the succesor node
+of T and Q the successor node of S.
+
+Proof: If NODE(P) has a nonempty left subtree, then a node is
+attached to the right of NODE(Q). In step C5, P and Q are
+set to the roots of these subtrees. By induction, on the
+subtrees, the right subtree of P is copied to the right subtree
+of Q and we are back at step C6 with P and Q set to the successors.
+If T has a nonempty left subtree, then P is set to the root of
+this tree and Q is set to the node created in C4. By induction,
+the right subtree of T is copied to the right subtree of S
+and we end up back at C6 with P set to the successor of the
+right subtree which by the definition of preorder traversal
+is the successor of T. On the other hand if T's left subtree
+is empty, then we already ended up at the successor of T.
