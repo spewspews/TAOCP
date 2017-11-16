@@ -23,12 +23,13 @@ And a program implementing the algorithm in MIX:
 LLINKT EQU 0:2
 RLINKT EQU 0:2
 P0  STJ  1F
-    LD5  0,5(LLINKT)
-    J5NN 1F
+    LD6  0,5(LLINKT)
+    J6NN 1F
 P1  LD5N 1,5(RLINKT)
     J5NN P1
-    ENN5 0,5
-1H  JMP *
+    ENN6 0,5
+1H  ENT5 0,6
+    JMP *
 
 Out of curiosity Algorithm S alone implemented in MIX:
 LLINKT EQU 0:2
